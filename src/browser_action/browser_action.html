@@ -16,7 +16,7 @@
     font-size: 2em;
   }
   #button{
-    display: inline-block;
+    /*display: inline-block;*/
     height:20px;
     width:70px;
     background-color:#088A08;
@@ -26,6 +26,9 @@
     border-radius: 5px;
     text-align:center;
     margin-top:2px;
+  }
+  #datetime {
+    display: inline-block;
   }
   .list {
     font-family:Helvetica, Ubuntu, Arial, sans-serif;
@@ -50,6 +53,25 @@
       <form>
         Reminder: <input type="text" id="reminder" name="remindertext"/>
       </form>
+      <div id="datetime"> Remind me at:
+        <select id="hour">
+          <option>hr</option>
+        </select>
+        <select id="minute">
+          <option>min</option>
+        </select>
+        <select id="month">
+          <option>MM</option>
+        </select>
+        <select id="day">
+          <option>dd</option>
+        </select>
+        <select id="year">
+          <option>yyyy</option>
+        </select>
+        <form>
+        </form>
+      </div>
       <div id="button">Submit</div>
     </div>
     <div id="list" class="list"></div>

@@ -1,43 +1,6 @@
 Firebase.enableLogging(true);
 var myDataRef = new Firebase('https://quickreminders.firebaseio.com/');
 var userRef = myDataRef.child("miriam/active")
-// var userRef = myDataRef.child("matt/active");
-
-// var reminders = {}
-
-// // Check for active reminders
-// var checkReminders = function() {
-//     // use the current time to filter
-//     // reminders that have already expired 
-//     // (or will expire within 1 minute)
-//     // (new Date()).getTime()
-//     console.log(reminders)
-//     // for key, val of reminders {
-//     //     // ...if key < current time ...
-//     // }
-// }
-
-// // Check for newly-active reminders every minute
-// setInterval checkReminders, 60000
-
-// var notifyUser = function(reminder) {
-//     // notify user of this reminder
-//     cleanUpReminder(reminder);
-// }
-
-// var cleanUpReminder = function(reminder) {
-//     // change the priority or move reminder
-//     // to other location in Firebase to indicate
-//     // that it has been discharged
-//     // perhaps move to userid/complete
-// }
-
-// userRef.on("value", function(snapshot){
-//     // reminders = snapshot.val()
-//     // get keys of reminders where key is before now
-//     // get keys (timestamps) that have already expired
-
-// });
 
 var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
@@ -65,8 +28,26 @@ function setDaysInMonth(month) {
     day.selectedIndex = Math.min(selectedDay, days);
 }
 
-function scheduleReminder(text, time) {
-    now = new Date()
+function scheduleReminder(text, time, pointer) {
+    now = new Date().getTime();
+    delay = time - now;
+    console.log(delay);
+    window.setTimeout(function() {remind(text, pointer)}, delay);
+}
+
+function remind(text, pointer) {
+    var options = {
+        'type' : 'basic',
+        'iconUrl' : 'icon128.png',
+        'title': 'Reminder!',
+        'message': text 
+    };
+    chrome.notifications.create("", options, function() {remove(pointer)});
+}
+
+function remove(pointer) {
+    finished = userRef.child(pointer);
+    finished.remove();
 }
 
 $(document).ready(function() {
@@ -115,7 +96,6 @@ $(document).ready(function() {
 
     
     $('#button').click(function() {
-        console.log(new Date($('#year').val(), months.indexOf($('#month').val()), $('#day').val(), $('#hour').val(), $('#minute').val()).getTime());
         reminderText = $('#reminder').val()
         var reminderEvent = {
             'text' : reminderText,
@@ -124,7 +104,7 @@ $(document).ready(function() {
         userRef.push(reminderEvent);
 
 
-        $('.list').prepend('<div class="item">'+ reminderText+ '</div>');
+        // $('.list').prepend('<div class="item">'+ reminderText+ '</div>');
             
     });
 
@@ -137,14 +117,15 @@ $(document).ready(function() {
         month.onchange = function() {
             var monthSelected = month.selectedIndex;
             setDaysInMonth(months[monthSelected - 1]);
-            console.log(months[monthSelected - 1]);
         }
 
         userRef.on('child_added', function(snapshot) {
+            pointer = snapshot.name();
             reminderText = snapshot.val().text;
             reminderTime = snapshot.val().timestamp;
             console.log(reminderText, reminderTime);
-            scheduleReminder(reminderText, reminderTime);
+            // $('.list').prepend('<div class="item">'+ reminderText+ '</div>');
+            scheduleReminder(reminderText, reminderTime, pointer);
         });
     });
 });

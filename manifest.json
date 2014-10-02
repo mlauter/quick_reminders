@@ -11,6 +11,7 @@
   },
   "default_locale": "en",
   "background": {
+    "scripts" : ["background.js"],
     "page": "src/bg/background.html",
     "persistent": true
   },
@@ -22,7 +23,8 @@
   "permissions": [
     "chrome://favicon/",
     "notifications",
-    "storage"
+    "storage",
+    "alarms"
   ],
   
   "content_security_policy": "script-src 'self' https://cdn.firebase.com https://*.firebaseio.com; object-src 'self'"

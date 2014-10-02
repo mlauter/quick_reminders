@@ -1,3 +1,4 @@
+
 Firebase.enableLogging(true);
 var myDataRef = new Firebase('https://quickreminders.firebaseio.com/');
 var userRef = myDataRef.child("miriam/active")
@@ -37,27 +38,6 @@ function preFillDate() {
     document.getElementById('year').selectedIndex = current.getYear() - 100 - 14 + 1;
 }
 
-function scheduleReminder(text, time, pointer) {
-    now = new Date().getTime();
-    delay = time - now;
-    console.log(delay);
-    window.setTimeout(function() {remind(text, pointer)}, delay);
-}
-
-function remind(text, pointer) {
-    var options = {
-        'type' : 'basic',
-        'iconUrl' : 'icon128.png',
-        'title': 'Reminder!',
-        'message': text 
-    };
-    chrome.notifications.create("", options, function() {remove(pointer)});
-}
-
-function remove(pointer) {
-    finished = userRef.child(pointer);
-    finished.remove();
-}
 
 $(document).ready(function() {
     var hour = document.getElementById("hour");

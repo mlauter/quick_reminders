@@ -28,6 +28,15 @@ function setDaysInMonth(month) {
     day.selectedIndex = Math.min(selectedDay, days);
 }
 
+function preFillDate() {
+    var current = new Date();
+    document.getElementById('hour').selectedIndex = current.getHours() + 2;
+    document.getElementById('minute').selectedIndex = current.getMinutes() + 1;
+    document.getElementById('month').selectedIndex = current.getMonth() + 1;
+    document.getElementById('day').selectedIndex = current.getDate();
+    document.getElementById('year').selectedIndex = current.getYear() - 100 - 14 + 1;
+}
+
 function scheduleReminder(text, time, pointer) {
     now = new Date().getTime();
     delay = time - now;
@@ -118,6 +127,7 @@ $(document).ready(function() {
             var monthSelected = month.selectedIndex;
             setDaysInMonth(months[monthSelected - 1]);
         }
+        preFillDate();
 
         userRef.on('child_added', function(snapshot) {
             pointer = snapshot.name();

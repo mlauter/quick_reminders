@@ -41,6 +41,34 @@ var userRef = myDataRef.child("miriam/active")
 
 var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
+var daysPerMonth = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+function setDaysInMonth(month) {
+    i = months.indexOf(month);
+    days = daysPerMonth[i];
+    var day = document.getElementById("day");
+    selectedDay = day.selectedIndex;
+    $('#day option').remove();
+    var header = document.createElement("option");
+    header.text = "dd";
+    day.appendChild(header);
+    for (var i = 1; i < days + 1; i++) {
+        var opt = document.createElement("option");
+        if (i < 10) {
+            opt.text = "0" + i;
+        } else {
+            opt.text = i;
+        }
+        opt.value = i;    
+        day.appendChild(opt);
+    }
+    day.selectedIndex = Math.min(selectedDay, days);
+}
+
+function scheduleReminder(text, time) {
+    now = new Date()
+}
+
 $(document).ready(function() {
     var hour = document.getElementById("hour");
     for (var i = 0; i < 24; i++) {
@@ -74,17 +102,7 @@ $(document).ready(function() {
         month.appendChild(opt);
     }
 
-    var day = document.getElementById("day");
-    for (var i = 1; i < 32; i++) {
-        var opt = document.createElement("option");
-        if (i < 10) {
-            opt.text = "0" + i;
-        } else {
-            opt.text = i;
-        }
-        opt.value = i;    
-        day.appendChild(opt);
-    }
+    setDaysInMonth("Jan");
 
     var year = document.getElementById("year");
     for (var i = 2014; i < 2051; i++) {
@@ -97,18 +115,17 @@ $(document).ready(function() {
 
     
     $('#button').click(function() {
-        var reminderText = $('#reminder').val();
-        console.log(reminderText);
-        userRef.push(reminderText)
+        console.log(new Date($('#year').val(), months.indexOf($('#month').val()), $('#day').val(), $('#hour').val(), $('#minute').val()).getTime());
+        reminderText = $('#reminder').val()
+        var reminderEvent = {
+            'text' : reminderText,
+            'timestamp' : new Date($('#year').val(), months.indexOf($('#month').val()), $('#day').val(), $('#hour').val(), $('#minute').val()).getTime()
+        };
+        userRef.push(reminderEvent);
 
 
         $('.list').prepend('<div class="item">'+ reminderText+ '</div>');
-    
-        // firebase
-        // myDataRef.set('User ' + name + ' says ' + text);
-        // or myDataRef.set({name: name, text: text});
-        // need to get the time the reminder should be sent
-        
+            
     });
 
     $('input').focus(function() {
@@ -119,14 +136,16 @@ $(document).ready(function() {
         var month = document.getElementById("month")
         month.onchange = function() {
             var monthSelected = month.selectedIndex;
-            console.log(monthSelected);
+            setDaysInMonth(months[monthSelected - 1]);
+            console.log(months[monthSelected - 1]);
         }
-        // if (month.options[month.selectedIndex].text === "Feb") {
-        //     console.log('February!');
-        //     for (i = 31; i > 28; i--) {
-        //         day.removeChild();
-        //     }
-        // }
+
+        userRef.on('child_added', function(snapshot) {
+            reminderText = snapshot.val().text;
+            reminderTime = snapshot.val().timestamp;
+            console.log(reminderText, reminderTime);
+            scheduleReminder(reminderText, reminderTime);
+        });
     });
 });
 
